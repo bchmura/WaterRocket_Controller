@@ -14,14 +14,14 @@ constexpr unsigned int SCREEN2_OLED_HEIGHT = 64;
 constexpr int SCREEN2_OLED_RESET_PIN = -1; // Reset pin # (or -1 if sharing Arduino reset pin)
 constexpr unsigned int SCREEN2_OLED_ADDRESS  = 0x3C;
 
-constexpr unsigned int LED_BRIGHTNESS = 125;
+constexpr unsigned int LED_BRIGHTNESS = 50;
 
 
 constexpr unsigned int BUZZER_PIN = 4;
 
-constexpr unsigned int BUTTON1_PIN = 100;
+constexpr unsigned int BUTTON_LAUNCH_PIN = 25;
 
-constexpr unsigned int BUTTON2_PIN = 200;
+constexpr unsigned int BUTTON_FUEL_PIN = 34;
 
 constexpr unsigned int LED_TOTAL_LEDS = 31;
 constexpr unsigned int LED_DATA_PIN = 27;

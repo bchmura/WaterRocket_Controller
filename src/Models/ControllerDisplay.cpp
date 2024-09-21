@@ -32,13 +32,13 @@ void ControllerDisplay::UpdateAppStatus(ApplicationState newAppState) {
     //if (newAppState != application_state) {
         application_state = newAppState;
         lastAppUpdateTime = std::chrono::high_resolution_clock::now();
-        Log.infoln("new app status detected");
+        //Log.infoln("new app status detected");
         isNewAppState = true;
   //  }
 }
 
 void ControllerDisplay::RunLoop() {
-    Log.infoln("run display loop");
+   // Log.infoln("run display loop");
     UpdateDisplays();
     UpdateLights();
     UpdateSound();
@@ -50,7 +50,7 @@ void ControllerDisplay::UpdateDisplays() {
     Log.infoln("Starting Updating display");
     //if (! isNewAppState) return;
 
-    Log.infoln("Updating display");
+   // Log.infoln("Updating display");
 
     int cx;
     char rocketVoltsText[5];
@@ -112,12 +112,12 @@ void ControllerDisplay::UpdateDisplays() {
     oledDisplay2.print("I");
     oledDisplay2.display();
 
-    Log.infoln("Update display completed");
+    //Log.infoln("Update display completed");
 }
 
 void ControllerDisplay::UpdateLights() {
 
-    Log.infoln("Updating lights");
+    //Log.infoln("Updating lights");
     FastLED.setBrightness(LED_BRIGHTNESS);
 
 
