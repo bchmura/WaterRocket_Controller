@@ -47,7 +47,7 @@ void ControllerDisplay::RunLoop() {
 
 void ControllerDisplay::UpdateDisplays() {
 
-    Log.infoln("Starting Updating display");
+   // Log.infoln("Starting Updating display");
     //if (! isNewAppState) return;
 
    // Log.infoln("Updating display");

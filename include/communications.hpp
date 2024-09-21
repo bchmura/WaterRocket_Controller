@@ -7,8 +7,8 @@ enum PacketType {
   StatusType = 0x01,
   PingType = 0x02,
   PingAckType = 0x03,
-  Command = 0x04,
-  CommandAck = 0x05
+  CmdToggleSolenoidType = 0x04,
+  CmdToggleActuatorType = 0x05
 };
 
 typedef struct {
@@ -21,6 +21,15 @@ typedef struct {
   unsigned int pingId;
  } PingAck;
 
+typedef struct {
+  uint8_t type = PacketType::CmdToggleSolenoidType;
+  bool newStateRequested;
+} CmdToggleSolenoid;
+
+typedef struct {
+  uint8_t type = PacketType::CmdToggleActuatorType;
+  bool newStateRequested;
+} CmdToggleActuator;
 
 
 

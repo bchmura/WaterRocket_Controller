@@ -19,8 +19,9 @@ void loopCheckButtons();
 void setupButtons();
 void sendPing();
 
-uint8_t controller_mac[] = {0xE4, 0x65, 0xB8, 0x14, 0x77, 0x14};
-uint8_t launcher_mac[] = {0xd0,0xef,0x76,0x45,0x01,0x08};
+uint8_t launcher_mac[] = {0xE4, 0x65, 0xB8, 0x14, 0x77, 0x14};
+uint8_t controller_mac[] = {0xd0,0xef,0x76,0x45,0x01,0x08};
+
 throbbingButtonState throbbingButton;
 ControllerDisplay display;
 ApplicationState appState;
@@ -110,6 +111,7 @@ void onRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
    snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
             mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4],
             mac_addr[5]);
+
    Log.infoln("Message received from %s",macStr);
 
 
@@ -128,7 +130,7 @@ void onRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
       case 0x01: {
          // This is a SystemStatus struct
          memcpy(&appState, &data[2], sizeof(appState));
-         //Log.infoln("Rocket Pressure at %d", appState.rocketPressurePsi);
+         Log.infoln("Rocket Pressure at %d", appState.rocketPressurePsi);
          break;
       }
       case PingAckType: {
@@ -161,6 +163,32 @@ void setupButtons() {
 }
 
 
+void sendCmdToggleSolenoid() {
+
+   Log.infoln("sendCmdToggleSolenoid");
+   CmdToggleSolenoid command;
+   command.newStateRequested = true;
+   uint8_t message[sizeof(command)];
+   memcpy(&message[0], &command, sizeof(command));
+   Log.infoln("Command created");
+   ESPNow.send_message(launcher_mac, message, sizeof(message));
+   Log.infoln("Command sent");
+
+};
+
+void sendCmdToggleActuator() {
+
+   Log.infoln("sendCmdToggleActuator");
+   CmdToggleActuator command;
+   command.newStateRequested = true;
+   uint8_t message[sizeof(command)];
+   memcpy(&message[0], &command, sizeof(command));
+   Log.infoln("Command created");
+   ESPNow.send_message(launcher_mac, message, sizeof(message));
+   Log.infoln("Command sent");
+
+};
+
 void loopCheckButtons()
 {
 
@@ -169,6 +197,8 @@ void loopCheckButtons()
       Log.infoln("##################### fuel button was pressed");
       //appState.isSolendoidOpen = solenoidControl.toggle();
       //appState.isDirty = true;
+      sendCmdToggleSolenoid();
+
    } else if (fuelButton.changed()) {
       Log.infoln("##################### fuel button was unpressed");
    }
@@ -178,6 +208,7 @@ void loopCheckButtons()
       Log.infoln("##################### launch button was pressed");
       //appState.isSolendoidOpen = solenoidControl.toggle();
       //appState.isDirty = true;
+      sendCmdToggleActuator();
    } else if (launchButton.changed()) {
       Log.infoln("##################### launch button was unpressed");
    }
