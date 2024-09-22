@@ -29,6 +29,8 @@ ApplicationState appState;
 Bounce2::Button fuelButton = Bounce2::Button();
 Bounce2::Button launchButton = Bounce2::Button();
 
+bool lastRequestToLauncherForActuator = false;
+bool lastRequestToLauncherForSolenoid = false;
 
 void setupDisplay() {
    display.Setup();
@@ -54,7 +56,7 @@ void setup() {
    setupButtons();
    setupDisplay();
    setupEspNow();
-   taskManager.schedule(repeatMillis(20000), sendPing);
+   //taskManager.schedule(repeatMillis(20000), sendPing);
    Log.infoln("main setup complete");
 }
 
@@ -112,8 +114,7 @@ void onRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
             mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4],
             mac_addr[5]);
 
-   Log.infoln("Message received from %s",macStr);
-
+  // Log.infoln("Message received from %s",macStr);
 
    uint8_t type = data[0];
    uint8_t subType = data[1];
@@ -130,7 +131,7 @@ void onRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
       case 0x01: {
          // This is a SystemStatus struct
          memcpy(&appState, &data[2], sizeof(appState));
-         Log.infoln("Rocket Pressure at %d", appState.rocketPressurePsi);
+         //Log.infoln("Rocket Pressure at %d", appState.rocketPressurePsi);
          break;
       }
       case PingAckType: {
@@ -163,11 +164,11 @@ void setupButtons() {
 }
 
 
-void sendCmdToggleSolenoid() {
-
-   Log.infoln("sendCmdToggleSolenoid");
+void sendCmdToggleSolenoid(bool newState) {
+   Log.infoln("sendCmdToggleSolenoid to %b", newState);
+   lastRequestToLauncherForSolenoid = newState;
    CmdToggleSolenoid command;
-   command.newStateRequested = true;
+   command.newStateRequested = newState;
    uint8_t message[sizeof(command)];
    memcpy(&message[0], &command, sizeof(command));
    Log.infoln("Command created");
@@ -176,11 +177,12 @@ void sendCmdToggleSolenoid() {
 
 };
 
-void sendCmdToggleActuator() {
+void sendCmdToggleActuator(bool newState) {
 
-   Log.infoln("sendCmdToggleActuator");
+   Log.infoln("sendCmdToggleActuator to %b", newState);
+   lastRequestToLauncherForActuator = newState;
    CmdToggleActuator command;
-   command.newStateRequested = true;
+   command.newStateRequested = newState;
    uint8_t message[sizeof(command)];
    memcpy(&message[0], &command, sizeof(command));
    Log.infoln("Command created");
@@ -197,7 +199,11 @@ void loopCheckButtons()
       Log.infoln("##################### fuel button was pressed");
       //appState.isSolendoidOpen = solenoidControl.toggle();
       //appState.isDirty = true;
-      sendCmdToggleSolenoid();
+      if (lastRequestToLauncherForSolenoid) {
+         sendCmdToggleSolenoid(false);
+      } else {
+         sendCmdToggleSolenoid(true);
+      }
 
    } else if (fuelButton.changed()) {
       Log.infoln("##################### fuel button was unpressed");
@@ -208,7 +214,13 @@ void loopCheckButtons()
       Log.infoln("##################### launch button was pressed");
       //appState.isSolendoidOpen = solenoidControl.toggle();
       //appState.isDirty = true;
-      sendCmdToggleActuator();
+      if (lastRequestToLauncherForActuator) {
+         sendCmdToggleActuator(false);
+      } else {
+         sendCmdToggleActuator(true);
+      }
+
+
    } else if (launchButton.changed()) {
       Log.infoln("##################### launch button was unpressed");
    }
